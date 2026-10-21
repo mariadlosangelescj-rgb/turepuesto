@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PiezaCerca · Repuestos en San Cristóbal</title>
+  <meta name="description" content="Encuentra repuestos para tu carro en las tiendas de San Cristóbal, compara precios y escríbeles por WhatsApp.">
+  <meta name="theme-color" content="#0f4c5c">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="img/icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/icono-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="top wrap">
+    <div class="top-row">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 0 0-8-8z"/></svg>
+        </div>
+        <div><h1 id="app-name">PiezaCerca</h1><small>San Cristóbal, Táchira</small></div>
+      </div>
+      <div class="cur" role="group" aria-label="Ver precios en" id="money">
+        <button data-money="todas" aria-pressed="true">Todas</button>
+        <button data-money="USD" aria-pressed="false">$</button>
+        <button data-money="COP" aria-pressed="false">COP</button>
+        <button data-money="VES" aria-pressed="false">Bs</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="view-buscar"></main>
+  <main class="wrap" id="view-mapa" hidden></main>
+  <main class="wrap" id="view-pedir" hidden></main>
+  <main class="wrap" id="view-tienda" hidden></main>
+</div>
+
+<nav class="tabs" aria-label="Secciones">
+  <div class="tabs-in">
+    <button data-tab="buscar" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Buscar</button>
+    <button data-tab="mapa"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Tiendas</button>
+    <button data-tab="pedir"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 10h8M8 13h5" stroke-linecap="round"/></svg>Pedir</button>
+    <button data-tab="tienda"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9 5.5 4h13L20 9v1a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0z"/><path d="M5 12v8h14v-8M10 20v-5h4v5"/></svg>Mi tienda</button>
+  </div>
+</nav>
+
+<div class="sheet-bg" id="sheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" id="sheet-in"></div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
