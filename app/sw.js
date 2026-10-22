@@ -1,6 +1,6 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
 // Los datos (repuestos, tiendas) siempre se piden frescos a internet.
-const VERSION = "tr-v2";
+const VERSION = "tr-v3";
 const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg",
   "js/app.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 

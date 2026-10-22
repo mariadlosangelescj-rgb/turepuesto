@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Tu Repuesto · Repuestos en San Cristóbal</title>
   <meta name="description" content="Encuentra repuestos para tu carro en las tiendas de San Cristóbal, compara precios y escríbeles por WhatsApp.">
-  <meta name="theme-color" content="#1446A0" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#102A5C" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#0f4c5c">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="img/icono.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/icono-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,8 +19,8 @@
   <header class="top wrap">
     <div class="top-row">
       <div class="brand">
-        <svg width="42" height="42" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" stroke="#FFC629" stroke-width="6" stroke-dasharray="7.46 7.46"/><circle cx="24" cy="24" r="16.5" fill="#FFC629"/><path d="M24 12.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13 7.5 13s7.5-7.4 7.5-13a7.5 7.5 0 0 0-7.5-7.5z" fill="var(--brand)"/><circle cx="24" cy="20" r="2.8" fill="#FFC629"/></svg>
-        <div><h1 id="app-name">Tu <b>Repuesto</b></h1><small>San Cristóbal, Táchira</small></div>
+        <svg class="logo" width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19" fill="none" style="stroke:var(--signal)" stroke-width="6" stroke-dasharray="7.46 7.46"/><circle cx="24" cy="24" r="16.5" style="fill:var(--signal)"/><path d="M24 12.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13 7.5 13s7.5-7.4 7.5-13a7.5 7.5 0 0 0-7.5-7.5z" style="fill:var(--hdr)"/><circle cx="24" cy="20" r="2.8" style="fill:var(--signal)"/></svg>
+        <div><h1 id="app-name">Tu Repuesto</h1><small>San Cristóbal, Táchira</small></div>
       </div>
       <div class="cur" role="group" aria-label="Ver precios en" id="money">
         <button data-money="todas" aria-pressed="true">Todas</button>
@@ -30,10 +29,6 @@
         <button data-money="VES" aria-pressed="false">Bs</button>
       </div>
     </div>
-    <label class="hdr-search" id="hdr-search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input type="search" id="f-q" placeholder="¿Qué repuesto buscas?" aria-label="Buscar repuesto" autocomplete="off" enterkeyhint="search">
-    </label>
   </header>
 
   <main class="wrap" id="view-buscar"></main>
