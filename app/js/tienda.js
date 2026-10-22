@@ -4,6 +4,7 @@ import { auth, authForm, signOut, passwordRecoveryForm, isAdmin } from "./auth.j
 import { $, esc, norm, money, toast, yearOptions, ago } from "./util.js";
 import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
+import { markRequestsSeen } from "./notify.js";
 
 // ---------- Planes ----------
 export const PLAN = {
@@ -98,16 +99,16 @@ const reqVeh = (r) => [r.make, r.model, r.year, r.engine ? `motor ${r.engine}` :
 function ordersHTML(pl) {
   const P = PLAN[pl], st = T.store;
   const head = (badge) => `<div class="toolbar"><h2 style="font-size:19px">Pedidos de clientes</h2>${badge}</div>`;
-  if (st.status !== "active") return `<section class="panel">${head("")}<p class="muted" style="margin:0;font-size:13.5px">Cuando aprobemos tu tienda verás aquí los repuestos que piden los clientes, para responderles con tu precio.</p></section>`;
+  if (st.status !== "active") return `<section class="panel" id="orders-sec">${head("")}<p class="muted" style="margin:0;font-size:13.5px">Cuando aprobemos tu tienda verás aquí los repuestos que piden los clientes, para responderles con tu precio.</p></section>`;
   if (!P.orders) {
     const up = pl === "plus" ? "plus" : "estandar";
     const btn = T.asStore ? "" : T.planReq ? '<div class="muted" style="font-size:12.5px">Solicitud enviada</div>' : `<button class="btn btn-signal btn-sm" data-t-reqplan="${up}">Quiero el plan ${PLAN[up].name}</button>`;
-    return `<section class="panel">${head("")}
+    return `<section class="panel" id="orders-sec">${head("")}
       <div class="locked"><b>${T.openCount ? `Hay ${T.openCount} pedido${T.openCount === 1 ? "" : "s"} de clientes esperando respuesta.` : "Los clientes piden repuestos que no encuentran en la app."}</b><span>Con el plan ${PLAN[up].name} ($${PLAN[up].price} al mes) puedes verlos y responderlos para ganar esas ventas.</span>${btn}</div></section>`;
   }
   const open = T.reqs.filter((r) => !r.mine), done = T.reqs.filter((r) => r.mine);
   const badge = `<span class="badge ${open.length ? "b-best" : "b-ok"}">${open.length} sin responder</span>`;
-  if (!T.reqs.length) return `<section class="panel">${head(badge)}<p class="muted" style="margin:0;font-size:13.5px">No hay pedidos ahora. Cuando un cliente pida un repuesto, aparecerá aquí.</p><button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button></section>`;
+  if (!T.reqs.length) return `<section class="panel" id="orders-sec">${head(badge)}<p class="muted" style="margin:0;font-size:13.5px">No hay pedidos ahora. Cuando un cliente pida un repuesto, aparecerá aquí.</p><button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button></section>`;
   const item = (r) => {
     const a = T.ans[r.id] || { price: "", note: "" };
     const top = `<div><b>${esc(r.part)}</b> · ${esc(reqVeh(r))}<div class="muted" style="font-size:12.5px">${ago(r.created_at)}${r.note ? ` · “${esc(r.note)}”` : ""}</div></div>`;
@@ -117,7 +118,7 @@ function ordersHTML(pl) {
       <div class="btn-row"><button class="btn btn-primary btn-sm" data-t-answer="${r.id}">Responder</button><button class="btn btn-ghost btn-sm" data-t-noans="${r.id}">No lo tengo</button></div>`}
     </div>`;
   };
-  return `<section class="panel">${head(badge)}
+  return `<section class="panel" id="orders-sec">${head(badge)}
     <p class="muted" style="margin:0;font-size:13px">El cliente ve tu respuesta en la app y te escribe por WhatsApp.</p>
     ${open.map(item).join("")}
     ${done.length ? `<details><summary class="muted" style="font-size:13px;cursor:pointer">Ya respondidos (${done.length})</summary>${done.map(item).join("")}</details>` : ""}
@@ -239,6 +240,7 @@ function renderPanel(v) {
   const st = T.store, pl = effPlan(), P = PLAN[pl], n = T.products.length;
   const versions = T.products.flatMap((p) => p.versions);
   const pending = st.status === "pending";
+  if (P.orders && !T.asStore && st.status === "active") markRequestsSeen();
   v.innerHTML = `
     <div class="toolbar" style="align-items:flex-start"><div style="min-width:0"><div class="eyebrow">${T.asStore ? "Viendo como administradora" : "Mi tienda"}</div><h2>${esc(st.name)}</h2><p class="muted" style="margin:2px 0 0;font-size:13px">${esc([st.zone, st.hours].filter(Boolean).join(" · "))}</p></div>${T.asStore ? `<button class="btn btn-primary btn-sm" data-t-exitas>Volver al panel</button>` : `<button class="btn-link" data-t-logout style="color:var(--muted)">Cerrar sesión</button>`}</div>
     ${!T.asStore && isAdmin() ? `<button class="btn btn-ghost btn-sm" data-go="admin" style="align-self:flex-start">Abrir panel de administradora</button>` : ""}
@@ -511,6 +513,13 @@ function renderInv() {
 
 // ---------- Eventos ----------
 export function bindTienda(go) {
+  // Llegó un pedido nuevo en vivo: actualizo solo la sección de pedidos
+  window.addEventListener("tr:request", async () => {
+    if (S.tab !== "tienda" || !T.store || T.asStore) return;
+    await loadRequests();
+    const sec = document.getElementById("orders-sec");
+    if (sec) { sec.outerHTML = ordersHTML(effPlan()); markRequestsSeen(); }
+  });
   document.addEventListener("submit", (e) => {
     if (e.target.id === "store-form") submitStore(e);
     if (e.target.id === "add-form") saveProduct(e);

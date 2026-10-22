@@ -5,7 +5,8 @@ import { renderMapa, bindMapa } from "./mapa.js";
 import { initAuth, bindAuth } from "./auth.js";
 import { renderTienda, bindTienda, resetTienda } from "./tienda.js";
 import { renderAdmin, bindAdmin, resetAdmin } from "./admin.js";
-import { renderPedir, bindPedir, resetPedir, checkNewResponses } from "./pedir.js";
+import { renderPedir, bindPedir, resetPedir } from "./pedir.js";
+import { startNotify, setDot } from "./notify.js";
 
 const RENDER = {
   buscar: renderBuscar,
@@ -19,6 +20,7 @@ export function go(tab) {
   S.tab = tab;
   document.querySelectorAll("main").forEach((m) => (m.hidden = m.id !== "view-" + tab));
   document.querySelectorAll(".tabs button").forEach((b) => (b.dataset.tab === tab ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+  if (tab === "pedir" || tab === "tienda") setDot(tab, false);
   RENDER[tab]();
   window.scrollTo(0, 0);
 }
@@ -54,10 +56,9 @@ async function start() {
     $("#view-buscar").innerHTML = `<div class="empty-state">No pudimos conectarnos. Revisa tu conexión a internet y recarga la página.</div>`;
     return;
   }
-  await initAuth((recovery) => { resetTienda(); resetAdmin(); resetPedir(); checkNewResponses(); if (recovery) go("tienda"); else if (["tienda", "admin", "pedir"].includes(S.tab)) RENDER[S.tab](); });
+  await initAuth((recovery) => { resetTienda(); resetAdmin(); resetPedir(); startNotify(); if (recovery) go("tienda"); else if (["tienda", "admin", "pedir"].includes(S.tab)) RENDER[S.tab](); });
   const h = location.hash;
-  checkNewResponses();
-  setInterval(checkNewResponses, 120000);
+  startNotify();
   go(h === "#pedir" ? "pedir" : h === "#admin" ? "admin" : h === "#tienda" || h.includes("type=recovery") ? "tienda" : "buscar");
 }
 

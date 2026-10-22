@@ -2,6 +2,7 @@ import { db } from "./db.js";
 import { S, here, storeById } from "./state.js";
 import { $, esc, distanceKm, kmText, waLink, toast, yearOptions, ago, store } from "./util.js";
 import { auth, authForm, signOut } from "./auth.js";
+import { setDot } from "./notify.js";
 
 // Pestaña "Pedir": el cliente pide un repuesto y las tiendas le responden
 const MAX_OPEN = 5; // pedidos abiertos a la vez por persona
@@ -43,25 +44,7 @@ const totalResponses = (list) => list.reduce((n, r) => n + r.responses.length, 0
 function markSeen() {
   if (!auth.user || !R.list) return;
   store.set("seen:" + auth.user.id, totalResponses(R.list));
-  setDot(false);
-}
-function setDot(on) {
-  const b = document.querySelector('.tabs [data-tab="pedir"]');
-  if (!b) return;
-  let d = b.querySelector(".tab-dot");
-  if (!d) { d = document.createElement("span"); d.className = "tab-dot"; b.appendChild(d); }
-  d.hidden = !on;
-}
-
-// Revisa si llegaron respuestas nuevas para encender el punto en la pestaña
-export async function checkNewResponses() {
-  if (!auth.user) return setDot(false);
-  if (S.tab === "pedir") return;
-  const { data, error } = await db.from("part_requests").select("request_responses(id)").eq("buyer_id", auth.user.id).limit(30);
-  if (error) return;
-  const n = data.reduce((k, r) => k + (r.request_responses?.length || 0), 0);
-  const seen = store.get("seen:" + auth.user.id, 0);
-  setDot(n > seen);
+  setDot("pedir", false);
 }
 
 // ---------- Pantalla ----------
@@ -101,7 +84,7 @@ export async function renderPedir() {
 
   if (!R.list) {
     try { await loadMine(); } catch (e) { console.error(e); const el = $("#req-list"); if (el) el.innerHTML = `<div class="empty-state">No pudimos cargar tus pedidos. Revisa tu conexión.<br><button class="btn btn-ghost btn-sm" data-p-reload>Reintentar</button></div>`; return; }
-  } else markSeen();
+  } else { renderList(); try { await loadMine(); } catch {} }
   renderList();
 
   // Mientras la pestaña está abierta, busca respuestas nuevas cada 30 segundos
@@ -177,6 +160,11 @@ async function submitRequest() {
 }
 
 export function bindPedir() {
+  // Llegó una respuesta en vivo: si estoy mirando Mis pedidos, la muestro de una vez
+  window.addEventListener("tr:response", async () => {
+    if (S.tab !== "pedir" || !auth.user) return;
+    try { await loadMine(); renderList(); } catch {}
+  });
   document.addEventListener("submit", (e) => { if (e.target.id === "req-form") { e.preventDefault(); if (!R.sending) submitRequest(); } });
   document.addEventListener("change", (e) => {
     const id = e.target.id;
@@ -189,7 +177,7 @@ export function bindPedir() {
   });
   document.addEventListener("click", async (e) => {
     const t = e.target;
-    if (t.closest("[data-p-logout]")) { clearInterval(timer); await signOut(); resetPedir(); setDot(false); renderPedir(); toast("Cerraste sesión."); return; }
+    if (t.closest("[data-p-logout]")) { clearInterval(timer); await signOut(); resetPedir(); setDot("pedir", false); renderPedir(); toast("Cerraste sesión."); return; }
     if (t.closest("[data-p-reload]")) { R.list = null; renderPedir(); return; }
     const c = t.closest("[data-p-close]");
     if (c) {
