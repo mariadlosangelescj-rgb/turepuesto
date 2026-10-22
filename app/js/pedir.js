@@ -3,6 +3,7 @@ import { S, here, storeById } from "./state.js";
 import { $, esc, distanceKm, kmText, waLink, toast, yearOptions, ago, store } from "./util.js";
 import { auth, authForm, signOut } from "./auth.js";
 import { setDot } from "./notify.js";
+import { pushCard } from "./push.js";
 
 // Pestaña "Pedir": el cliente pide un repuesto y las tiendas le responden
 const MAX_OPEN = 5; // pedidos abiertos a la vez por persona
@@ -68,6 +69,7 @@ export async function renderPedir() {
   const email = auth.user.email || "";
   v.innerHTML = head + `
     <div class="acct"><span class="acct-ico">${esc((email[0] || "?").toUpperCase())}</span><div style="min-width:0;overflow:hidden;text-overflow:ellipsis"><b>Mi cuenta</b><div class="muted" style="font-size:12px">${esc(email)}</div></div><button class="btn-link" data-p-logout>Cerrar sesión</button></div>
+    ${pushCard("Te avisamos cuando una tienda responda tus pedidos, aunque tengas la app cerrada.")}
     <form class="panel" id="req-form" novalidate>
       <label class="fl">Repuesto que necesitas<input type="text" id="r-part" maxlength="120" placeholder="Ej: Bomba de agua" value="${esc(f.part)}"></label>
       <div class="grid3">

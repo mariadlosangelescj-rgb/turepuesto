@@ -1,5 +1,6 @@
 import { db } from "./db.js";
 import { esc } from "./util.js";
+import { unlinkPush } from "./push.js";
 
 // Sesión actual (null si nadie ha entrado)
 export const auth = { user: null, recovery: false, role: "user" };
@@ -25,6 +26,7 @@ export async function initAuth(onChange) {
 }
 
 export async function signOut() {
+  await unlinkPush();
   await db.auth.signOut();
 }
 

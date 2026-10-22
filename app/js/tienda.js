@@ -5,6 +5,7 @@ import { $, esc, norm, money, toast, yearOptions, ago } from "./util.js";
 import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
 import { markRequestsSeen } from "./notify.js";
+import { pushCard } from "./push.js";
 
 // ---------- Planes ----------
 export const PLAN = {
@@ -108,7 +109,7 @@ function ordersHTML(pl) {
   }
   const open = T.reqs.filter((r) => !r.mine), done = T.reqs.filter((r) => r.mine);
   const badge = `<span class="badge ${open.length ? "b-best" : "b-ok"}">${open.length} sin responder</span>`;
-  if (!T.reqs.length) return `<section class="panel" id="orders-sec">${head(badge)}<p class="muted" style="margin:0;font-size:13.5px">No hay pedidos ahora. Cuando un cliente pida un repuesto, aparecerá aquí.</p><button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button></section>`;
+  if (!T.reqs.length) return `<section class="panel" id="orders-sec">${head(badge)}<p class="muted" style="margin:0;font-size:13.5px">No hay pedidos ahora. Cuando un cliente pida un repuesto, aparecerá aquí.</p>${T.asStore ? "" : pushCard("Te avisamos cuando un cliente pida un repuesto, aunque tengas la app cerrada.")}<button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button></section>`;
   const item = (r) => {
     const a = T.ans[r.id] || { price: "", note: "" };
     const top = `<div><b>${esc(r.part)}</b> · ${esc(reqVeh(r))}<div class="muted" style="font-size:12.5px">${ago(r.created_at)}${r.note ? ` · “${esc(r.note)}”` : ""}</div></div>`;
@@ -120,6 +121,7 @@ function ordersHTML(pl) {
   };
   return `<section class="panel" id="orders-sec">${head(badge)}
     <p class="muted" style="margin:0;font-size:13px">El cliente ve tu respuesta en la app y te escribe por WhatsApp.</p>
+    ${T.asStore ? "" : pushCard("Te avisamos cuando un cliente pida un repuesto, aunque tengas la app cerrada.")}
     ${open.map(item).join("")}
     ${done.length ? `<details><summary class="muted" style="font-size:13px;cursor:pointer">Ya respondidos (${done.length})</summary>${done.map(item).join("")}</details>` : ""}
     <button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button>

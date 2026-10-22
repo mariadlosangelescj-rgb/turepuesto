@@ -7,3 +7,6 @@ export const SUPABASE_KEY = "sb_publishable_ss4NVuuohfdBDhY0pUbZig_B6XIzVbF";
 export const CENTRO = { lat: 7.7669, lng: -72.2250 };
 
 export const APP_NAME = "Tu Repuesto";
+
+// Clave pública para las notificaciones al celular (la privada está solo en Supabase)
+export const VAPID_PUBLIC_KEY = "BJxM15huA0BHnQkSkGi_cuMvjgfCikKEZJuNbeT8CS-679PR2xZGPnl5los284K2LgLMjtyWEyFVLGXyObHkTa0";
