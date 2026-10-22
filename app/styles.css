@@ -310,3 +310,4 @@ a.btn-ghost{color:var(--ink)}
 .form-msg{font-size:13.5px;border-radius:8px;padding:9px 11px;background:var(--warn-soft);color:var(--warn);font-weight:600}
 .form-msg.ok{background:var(--ok-soft);color:var(--ok)}
 button:disabled{opacity:.6;cursor:default}
+.brand div{min-width:0}.brand h1{overflow:hidden;text-overflow:ellipsis}

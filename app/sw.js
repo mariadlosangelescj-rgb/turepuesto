@@ -1,8 +1,8 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
 // Los datos (repuestos, tiendas) siempre se piden frescos a internet.
-const VERSION = "tr-v4";
+const VERSION = "tr-v5";
 const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg",
-  "js/app.js", "js/auth.js", "js/tienda.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
+  "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -1,6 +1,6 @@
 import { db, photoUrl } from "./db.js";
 import { S } from "./state.js";
-import { auth, authForm, signOut, passwordRecoveryForm } from "./auth.js";
+import { auth, authForm, signOut, passwordRecoveryForm, isAdmin } from "./auth.js";
 import { $, esc, norm, money, toast, yearOptions } from "./util.js";
 import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
@@ -26,11 +26,13 @@ const T = {
   loaded: false, store: null, products: [], contacts7: 0, planReq: null,
   invQ: "", invF: "todos", showPlans: false,
   editing: null, fs: null, fv: null, photoFile: null, photoPreview: null, confirmDel: false, saving: false,
-  regPin: null,
+  regPin: null, asStore: null,
 };
 let regMap = null;
 
-export function resetTienda() { Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null }); }
+export function resetTienda() { Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null, asStore: null }); }
+// La administradora puede abrir el panel de cualquier tienda para cargarle repuestos
+export function openAsStore(id) { resetTienda(); T.asStore = id; }
 
 function effPlan() {
   const s = T.store;
@@ -44,7 +46,8 @@ const thumb = (p) => { const u = p.photo_path ? photoUrl(p.photo_path) : null; r
 
 // ---------- Carga de datos ----------
 async function loadAll() {
-  const { data: store, error } = await db.from("stores").select("*").eq("owner_id", auth.user.id).maybeSingle();
+  const q = db.from("stores").select("*");
+  const { data: store, error } = await (T.asStore ? q.eq("id", T.asStore) : q.eq("owner_id", auth.user.id)).maybeSingle();
   if (error) throw error;
   T.store = store;
   if (store) await Promise.all([loadProducts(), loadExtras()]);
@@ -79,6 +82,7 @@ export async function renderTienda() {
     try { await loadAll(); } catch (e) { console.error(e); v.innerHTML = `<div class="empty-state">No pudimos cargar tu tienda. Revisa tu conexión y vuelve a intentarlo.<br><button class="btn btn-ghost btn-sm" data-t-reload>Reintentar</button></div>`; return; }
   }
   if (S.tab !== "tienda") return;
+  if (!T.store && isAdmin() && !T.asStore) { v.innerHTML = `<div><div class="eyebrow">Administradora</div><h2>Hola</h2></div><div class="admin-bar">Tu cuenta es de administradora. Desde tu panel apruebas tiendas, activas planes y cargas repuestos por cualquier tienda.</div><button class="btn btn-primary" data-go="admin">Abrir panel de administradora</button><button class="btn-link" data-t-logout style="color:var(--muted);align-self:center">Cerrar sesión</button>`; return; }
   if (!T.store) { renderRegister(v); return; }
   if (T.store.status === "rejected" || T.store.status === "suspended") { renderBlocked(v); return; }
   renderPanel(v);
@@ -172,7 +176,8 @@ function renderPanel(v) {
   const versions = T.products.flatMap((p) => p.versions);
   const pending = st.status === "pending";
   v.innerHTML = `
-    <div class="toolbar" style="align-items:flex-start"><div style="min-width:0"><div class="eyebrow">Mi tienda</div><h2>${esc(st.name)}</h2><p class="muted" style="margin:2px 0 0;font-size:13px">${esc([st.zone, st.hours].filter(Boolean).join(" · "))}</p></div><button class="btn-link" data-t-logout style="color:var(--muted)">Cerrar sesión</button></div>
+    <div class="toolbar" style="align-items:flex-start"><div style="min-width:0"><div class="eyebrow">${T.asStore ? "Viendo como administradora" : "Mi tienda"}</div><h2>${esc(st.name)}</h2><p class="muted" style="margin:2px 0 0;font-size:13px">${esc([st.zone, st.hours].filter(Boolean).join(" · "))}</p></div>${T.asStore ? `<button class="btn btn-primary btn-sm" data-t-exitas>Volver al panel</button>` : `<button class="btn-link" data-t-logout style="color:var(--muted)">Cerrar sesión</button>`}</div>
+    ${!T.asStore && isAdmin() ? `<button class="btn btn-ghost btn-sm" data-go="admin" style="align-self:flex-start">Abrir panel de administradora</button>` : ""}
     ${pending ? `<div class="welcome"><b>Tu tienda está en revisión.</b> Verificamos que exista y te avisamos por WhatsApp, normalmente en menos de 24 horas. Mientras tanto, ya puedes ir cargando tus repuestos: se verán apenas la aprobemos.</div>` : ""}
     ${!pending && !n ? `<div class="welcome"><b>¡Tu tienda está activa!</b> Empieza publicando tus repuestos más vendidos.</div>` : ""}
     <div class="stats">
@@ -468,6 +473,7 @@ export function bindTienda(go) {
     if (!t.closest("#view-tienda")) return;
     if (t.closest("[data-t-logout]")) { await signOut(); resetTienda(); renderTienda(); toast("Cerraste sesión."); return; }
     if (t.closest("[data-t-reload]")) { T.loaded = false; renderTienda(); return; }
+    if (t.closest("[data-t-exitas]")) { resetTienda(); go("admin"); return; }
     if (t.closest("[data-t-myloc]")) {
       if (!navigator.geolocation) return toast("Tu teléfono no permite compartir la ubicación.");
       navigator.geolocation.getCurrentPosition((p) => {

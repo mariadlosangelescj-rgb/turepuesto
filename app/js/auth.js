@@ -2,16 +2,25 @@ import { db } from "./db.js";
 import { esc } from "./util.js";
 
 // Sesión actual (null si nadie ha entrado)
-export const auth = { user: null, recovery: false };
+export const auth = { user: null, recovery: false, role: "user" };
+export const isAdmin = () => auth.role === "admin";
+
+async function loadRole() {
+  auth.role = "user";
+  if (!auth.user) return;
+  const { data } = await db.from("profiles").select("role").eq("id", auth.user.id).maybeSingle();
+  auth.role = data?.role || "user";
+}
 
 export async function initAuth(onChange) {
   const { data } = await db.auth.getSession();
   auth.user = data.session?.user ?? null;
-  db.auth.onAuthStateChange((event, session) => {
+  await loadRole();
+  db.auth.onAuthStateChange(async (event, session) => {
     const before = auth.user?.id;
     auth.user = session?.user ?? null;
     if (event === "PASSWORD_RECOVERY") { auth.recovery = true; onChange(true); return; }
-    if (before !== auth.user?.id) onChange();
+    if (before !== auth.user?.id) { await loadRole(); onChange(); }
   });
 }
 
