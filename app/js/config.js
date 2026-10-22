@@ -6,4 +6,4 @@ export const SUPABASE_KEY = "sb_publishable_ss4NVuuohfdBDhY0pUbZig_B6XIzVbF";
 // Centro de San Cristóbal, se usa si la persona no comparte su ubicación
 export const CENTRO = { lat: 7.7669, lng: -72.2250 };
 
-export const APP_NAME = "PiezaCerca";
+export const APP_NAME = "Tu Repuesto";

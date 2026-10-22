@@ -1,31 +1,31 @@
 
-/* Layout: one phone-width app column, sticky header, bottom tab bar; workshop palette of petrol blue and safety yellow */
+/* Tu Repuesto · columna de app para teléfono, encabezado azul fijo, barra de pestañas abajo. Azul de confianza y amarillo de acento. */
 :root{
-  --bg:#e9eef0; --surface:#ffffff; --surface-2:#f4f7f8; --ink:#13232b; --muted:#5a6a72; --line:#d3dbde;
-  --petrol:#0f4c5c; --petrol-soft:#dcebef; --signal:#f2b705; --signal-ink:#231a00;
-  --ok:#1d7f47; --ok-soft:#dff3e7; --warn:#a8401a; --warn-soft:#fbe7de;
+  --bg:#F2F5FA; --surface:#ffffff; --surface-2:#F4F6FA; --ink:#121A2B; --muted:#5A6478; --line:#DDE3EE;
+  --brand:#1446A0; --petrol:#1446A0; --petrol-soft:#E6EDF9; --signal:#FFC629; --signal-ink:#121A2B;
+  --ok:#146B3A; --ok-soft:#E3F4EA; --warn:#B3261E; --warn-soft:#FCE8E6;
   --map:#e4ebe6; --map-road:#ffffff; --map-river:#9fc7d6; --map-block:#d6e0da;
-  --shadow:0 1px 2px rgba(15,40,50,.08),0 4px 14px rgba(15,40,50,.06);
-  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
-  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --shadow:0 1px 3px rgba(18,26,43,.08);
+  --f-display:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0c1418; --surface:#14212a; --surface-2:#192a34; --ink:#e4edf0; --muted:#94a6ae; --line:#26363f;
-  --petrol:#62b4c7; --petrol-soft:#183843; --signal:#f5c33b; --signal-ink:#231a00;
-  --ok:#52c585; --ok-soft:#163626; --warn:#f08d62; --warn-soft:#3a2017;
+  --bg:#0A1120; --surface:#141E33; --surface-2:#1A2640; --ink:#E8EEF8; --muted:#9AA8C2; --line:#243150;
+  --brand:#102A5C; --petrol:#8FB3F5; --petrol-soft:#1D2D52; --signal:#FFC629; --signal-ink:#121A2B;
+  --ok:#7FE0A6; --ok-soft:#173D2A; --warn:#F2A39B; --warn-soft:#3D1D1A;
   --map:#13201f; --map-road:#2a3b3d; --map-river:#1f4b5a; --map-block:#1a2a28;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}}
+  --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0c1418; --surface:#14212a; --surface-2:#192a34; --ink:#e4edf0; --muted:#94a6ae; --line:#26363f;
-  --petrol:#62b4c7; --petrol-soft:#183843; --signal:#f5c33b; --signal-ink:#231a00;
-  --ok:#52c585; --ok-soft:#163626; --warn:#f08d62; --warn-soft:#3a2017;
+  --bg:#0A1120; --surface:#141E33; --surface-2:#1A2640; --ink:#E8EEF8; --muted:#9AA8C2; --line:#243150;
+  --brand:#102A5C; --petrol:#8FB3F5; --petrol-soft:#1D2D52; --signal:#FFC629; --signal-ink:#121A2B;
+  --ok:#7FE0A6; --ok-soft:#173D2A; --warn:#F2A39B; --warn-soft:#3D1D1A;
   --map:#13201f; --map-road:#2a3b3d; --map-river:#1f4b5a; --map-block:#1a2a28;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}
+  --shadow:none; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--petrol)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--brand)}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--signal);outline-offset:2px}
@@ -34,9 +34,7 @@ button{cursor:pointer}
 .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 /* header */
-header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--petrol);color:#fff;padding-block:12px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header.top{background:#0f2f39}}
-:root[data-theme="dark"] header.top{background:#0f2f39}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--brand);color:#fff;padding-block:14px 16px;display:flex;flex-direction:column;gap:14px}
 .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .brand-mark{width:34px;height:34px;border-radius:8px;background:var(--signal);color:var(--signal-ink);display:grid;place-items:center;flex:none}
@@ -305,3 +303,42 @@ body{font-size:15px}
 a.btn{text-decoration:none}
 .thumb img{width:100%;height:100%;object-fit:cover}
 a.btn-ghost{color:var(--ink)}
+
+/* ---- Diseño A (Tu Repuesto) ---- */
+.brand h1{font-family:var(--f-body);font-weight:500;font-size:20px;letter-spacing:-.2px}
+.brand h1 b{font-weight:800}
+.brand small{opacity:.85;letter-spacing:0}
+.cur{border-radius:999px;background:rgba(255,255,255,.14)}
+.cur button{border-radius:999px;font-weight:700;opacity:1;padding:5px 8px}
+h2{font-family:var(--f-body);font-weight:800;letter-spacing:-.2px}
+.hdr-search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid transparent;border-radius:12px;padding:0 14px;height:50px;color:var(--muted)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hdr-search{background:var(--surface-2);border-color:#2C3A58}}
+:root[data-theme="dark"] .hdr-search{background:var(--surface-2);border-color:#2C3A58}
+.hdr-search input{border:0;outline:0;background:transparent;font-size:16px;color:var(--ink);flex:1;min-width:0;padding:0;box-shadow:none}
+.car-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+@media (prefers-color-scheme:light){.car-card{border-color:transparent}}
+.car-row{display:flex;align-items:center;gap:12px}
+.car-ico{width:40px;height:40px;border-radius:10px;background:var(--petrol-soft);color:var(--petrol);display:grid;place-items:center;flex:none}
+.car-txt{display:flex;flex-direction:column;min-width:0;flex:1}
+.car-txt span{font-size:12px;color:var(--muted);font-weight:600}
+.car-txt b{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.car-btn{border:0;background:none;color:var(--petrol);font-weight:700;font-size:14px;min-height:44px;padding:0 4px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--petrol);border-color:var(--petrol);color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pill[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}}
+:root[data-theme="dark"] .pill[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
+.card{border-radius:14px;box-shadow:var(--shadow)}
+@media (prefers-color-scheme:light){.card{border-color:transparent}}
+.price b{font-family:var(--f-body);font-weight:800;font-size:18px}
+.tag-star{background:var(--signal);color:var(--signal-ink)}
+.tabs button[aria-current="page"]{color:var(--petrol)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-current="page"]{color:var(--signal)}}
+:root[data-theme="dark"] .tabs button[aria-current="page"]{color:var(--signal)}
+.tabs button[aria-current="page"]::before{display:none}
+.btn-primary{background:var(--brand);color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn-primary{background:var(--signal);color:var(--signal-ink)}}
+:root[data-theme="dark"] .btn-primary{background:var(--signal);color:var(--signal-ink)}
+.tag-used{background:#FDE7C8;color:#7A4100}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag-used{background:#3D2A10;color:#F5B971}}
+:root[data-theme="dark"] .tag-used{background:#3D2A10;color:#F5B971}

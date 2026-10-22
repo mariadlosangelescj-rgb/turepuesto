@@ -29,39 +29,31 @@ function engineOptions(make, model, sel) {
 export function renderBuscar() {
   const v = $("#view-buscar");
   const sf = S.storeFilter ? storeById(S.storeFilter) : null;
+  const open = S.carOpen ?? !S.car.make;
+  $("#f-q").value = S.q;
   v.innerHTML = `
-    <section class="plate-card" aria-label="Mi carro">
-      <div class="eyebrow">Mi carro</div>
-      <div class="plate"><div class="band">VEN</div><div class="txt ${S.car.make ? "" : "empty"}">${esc(plateText())}</div></div>
-      <div class="selects">
+    <section class="car-card" aria-label="Mi carro">
+      <div class="car-row">
+        <div class="car-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17M7 17v2M17 17v2"/><circle cx="8" cy="14.5" r=".6"/><circle cx="16" cy="14.5" r=".6"/></svg></div>
+        <div class="car-txt"><span>Mi carro</span><b>${esc(S.car.make ? plateText() : "Elige tu carro")}</b></div>
+        ${S.car.make ? `<button class="car-btn" data-car-toggle>${open ? "Listo" : "Cambiar"}</button>` : ""}
+      </div>
+      ${open ? `<div class="selects">
         <select id="f-make" aria-label="Marca">${makeOptions(S.car.make)}</select>
         <select id="f-model" aria-label="Modelo">${modelOptions(S.car.make, S.car.model)}</select>
         <select id="f-year" aria-label="Año">${yearOptions(S.car.year)}</select>
         <select id="f-engine" aria-label="Motor">${engineOptions(S.car.make, S.car.model, S.car.engine)}</select>
-      </div>
+      </div>` : ""}
     </section>
-    <div class="search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input type="search" id="f-q" placeholder="¿Qué repuesto buscas?" value="${esc(S.q)}" aria-label="Buscar repuesto" autocomplete="off" enterkeyhint="search">
+    ${S.q ? "" : `<div class="chips">${["Pastillas de freno", "Filtro de aceite", "Bomba de agua", "Batería", "Amortiguador"].map((c) => `<button class="chip" data-chip="${c}">${c}</button>`).join("")}</div>`}
+    <div class="pills" role="group" aria-label="Ordenar y filtrar">
+      <button class="pill" data-sort="near" aria-pressed="${S.sort === "near"}">Más cerca</button>
+      <button class="pill" data-sort="price" aria-pressed="${S.sort === "price"}">Más económico</button>
+      <button class="pill" data-cond="nuevo" aria-pressed="${S.cond === "nuevo"}">Nuevo</button>
+      <button class="pill" data-cond="usado" aria-pressed="${S.cond === "usado"}">Usado</button>
+      <button class="pill" data-stock aria-pressed="${S.onlyStock}">Disponibles</button>
     </div>
-    <div class="chips">${["Pastillas de freno", "Filtro de aceite", "Bomba de agua", "Batería", "Amortiguador"].map((c) => `<button class="chip" data-chip="${c}">${c}</button>`).join("")}</div>
-    <div class="filters">
-      <div class="frow"><span class="flabel">Ordenar</span>
-        <div class="seg" role="group" aria-label="Ordenar">
-          <button data-sort="near" aria-pressed="${S.sort === "near"}">Más cerca</button>
-          <button data-sort="price" aria-pressed="${S.sort === "price"}">Más económico</button>
-        </div>
-      </div>
-      <div class="frow"><span class="flabel">Estado</span>
-        <div class="seg" role="group" aria-label="Estado del repuesto">
-          <button data-cond="todos" aria-pressed="${S.cond === "todos"}">Todos</button>
-          <button data-cond="nuevo" aria-pressed="${S.cond === "nuevo"}">Nuevo</button>
-          <button data-cond="usado" aria-pressed="${S.cond === "usado"}">Usado</button>
-        </div>
-      </div>
-      <label class="check"><input type="checkbox" id="f-stock" ${S.onlyStock ? "checked" : ""}> Solo disponibles</label>
-      ${S.loc ? "" : `<div class="loc-note">Las distancias se calculan desde el centro de San Cristóbal. <button data-loc>Usar mi ubicación</button></div>`}
-    </div>
+    ${S.loc ? "" : `<div class="loc-note">Distancias desde el centro de San Cristóbal. <button data-loc>Usar mi ubicación</button></div>`}
     ${sf ? `<div class="toolbar"><span class="muted" style="font-size:13px">Repuestos de <b>${esc(sf.name)}</b></span><button class="btn btn-ghost btn-sm" data-clear-store>Ver todas las tiendas</button></div>` : ""}
     <div id="res"></div>`;
   search();
@@ -74,7 +66,7 @@ export async function search() {
   const text = norm(S.q);
   if (!S.car.make && text.length < 2 && !S.storeFilter) {
     results = [];
-    res.innerHTML = `<div class="empty-state">Elige tu carro arriba o escribe el repuesto que buscas.</div>`;
+    res.innerHTML = `<div class="empty-state">Elige tu carro o escribe arriba el repuesto que buscas.</div>`;
     return;
   }
   const seq = ++searchSeq;
@@ -156,7 +148,7 @@ export async function openResult(i) {
   if (!r) return;
   const st = r.st;
   const car = S.car.make ? plateText() : vehText(r);
-  const msg = `Hola, vi en PiezaCerca: ${r.p.name}${r.part_brand ? ` marca ${r.part_brand}` : ""}${r.part_number ? ` (ref. ${r.part_number})` : ""} para ${car}. ¿Lo tienen disponible? Precio publicado: ${money(r.price, r.p.currency)}.`;
+  const msg = `Hola, vi en Tu Repuesto: ${r.p.name}${r.part_brand ? ` marca ${r.part_brand}` : ""}${r.part_number ? ` (ref. ${r.part_number})` : ""} para ${car}. ¿Lo tienen disponible? Precio publicado: ${money(r.price, r.p.currency)}.`;
   const maps = st.lat != null ? `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lng}` : null;
 
   $("#sheet-in").innerHTML = `
@@ -217,19 +209,22 @@ export function logContact(storeId, versionId) {
 export function bindBuscar() {
   document.addEventListener("change", (e) => {
     const id = e.target.id;
-    if (id === "f-make") { S.car = { make: e.target.value, model: "", year: S.car.year, engine: "" }; saveCar(); renderBuscar(); }
+    if (id === "f-make") { S.carOpen = true; S.car = { make: e.target.value, model: "", year: S.car.year, engine: "" }; saveCar(); renderBuscar(); }
     else if (id === "f-model") { S.car.model = e.target.value; S.car.engine = ""; saveCar(); renderBuscar(); }
     else if (id === "f-year") { S.car.year = e.target.value; saveCar(); renderBuscar(); }
     else if (id === "f-engine") { S.car.engine = e.target.value; saveCar(); renderBuscar(); }
-    else if (id === "f-stock") { S.onlyStock = e.target.checked; search(); }
   });
   const typed = debounce(() => search(), 300);
-  document.addEventListener("input", (e) => { if (e.target.id === "f-q") { S.q = e.target.value; typed(); } });
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "f-q") { S.q = e.target.value; const ch = document.querySelector("#view-buscar .chips"); if (ch) ch.hidden = !!S.q; typed(); }
+  });
   document.addEventListener("click", (e) => {
     const t = e.target;
-    const chip = t.closest("[data-chip]"); if (chip) { S.q = chip.dataset.chip; $("#f-q").value = S.q; search(); return; }
+    const chip = t.closest("[data-chip]"); if (chip) { S.q = chip.dataset.chip; renderBuscar(); return; }
     const so = t.closest("[data-sort]"); if (so) { S.sort = so.dataset.sort; renderBuscar(); return; }
-    const co = t.closest("[data-cond]"); if (co) { S.cond = co.dataset.cond; renderBuscar(); return; }
+    const co = t.closest("[data-cond]"); if (co) { S.cond = S.cond === co.dataset.cond ? "todos" : co.dataset.cond; renderBuscar(); return; }
+    if (t.closest("[data-stock]")) { S.onlyStock = !S.onlyStock; renderBuscar(); return; }
+    if (t.closest("[data-car-toggle]")) { S.carOpen = !(S.carOpen ?? !S.car.make); renderBuscar(); return; }
     const card = t.closest("[data-r]"); if (card) { openResult(+card.dataset.r); return; }
     const ct = t.closest("[data-contact]"); if (ct) { const [s, v] = ct.dataset.contact.split(":"); logContact(+s, +v); return; }
     if (t.closest("[data-clear-store]")) { S.storeFilter = null; renderBuscar(); return; }

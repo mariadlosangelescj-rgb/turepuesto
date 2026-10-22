@@ -26,7 +26,7 @@ export function renderMapa() {
         <div class="muted" style="font-size:13px">${esc([s.zone, s.address].filter(Boolean).join(" · "))}${s.hours ? ` · ${esc(s.hours)}` : ""}</div>
         <div class="btn-row">
           <button class="btn btn-primary btn-sm" data-store="${s.id}">Ver repuestos</button>
-          <a class="btn btn-ghost btn-sm" href="${esc(waLink(s.whatsapp, "Hola, los vi en PiezaCerca."))}" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn btn-ghost btn-sm" href="${esc(waLink(s.whatsapp, "Hola, los vi en Tu Repuesto."))}" target="_blank" rel="noopener">WhatsApp</a>
         </div>
       </div>`).join("")}</div>`
       : `<div class="empty-state">Todavía no hay tiendas activas. Pronto aparecerán aquí.</div>`}`;

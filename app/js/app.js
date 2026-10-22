@@ -19,6 +19,7 @@ export function go(tab) {
   S.tab = tab;
   document.querySelectorAll("main").forEach((m) => (m.hidden = m.id !== "view-" + tab));
   document.querySelectorAll(".tabs button").forEach((b) => (b.dataset.tab === tab ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
+  $("#hdr-search").hidden = tab !== "buscar";
   RENDER[tab]();
   window.scrollTo(0, 0);
 }
@@ -36,6 +37,7 @@ function bindGlobal() {
   $("#sheet").addEventListener("click", (e) => { if (e.target.id === "sheet" || e.target.closest("[data-close]")) closeSheet(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
   document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
+  $("#f-q").addEventListener("focus", () => { if (S.tab !== "buscar") go("buscar"); });
 }
 
 async function start() {
