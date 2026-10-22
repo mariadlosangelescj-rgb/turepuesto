@@ -40,7 +40,7 @@ revoke all on schema private from public, anon, authenticated;
 create table if not exists private.ajustes (clave text primary key, valor text not null);
 alter table private.ajustes enable row level security;
 insert into private.ajustes (clave, valor) values
-  ('aviso_url', 'https://vtjfbnhnhjhoxdzdlyly.supabase.co/functions/v1/avisar'),
+  ('aviso_url', 'https://vtjfbnhnhjhoxdzdlyly.supabase.co/functions/v1/hyper-processor'),
   ('aviso_secret', 'PEGA_AQUI_EL_AVISO_SECRET')
 on conflict (clave) do update set valor = excluded.valor;
 
