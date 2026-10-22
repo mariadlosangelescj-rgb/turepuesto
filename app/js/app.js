@@ -5,16 +5,12 @@ import { renderMapa, bindMapa } from "./mapa.js";
 import { initAuth, bindAuth } from "./auth.js";
 import { renderTienda, bindTienda, resetTienda } from "./tienda.js";
 import { renderAdmin, bindAdmin, resetAdmin } from "./admin.js";
-
-// Pantallas que todavía se están construyendo
-function renderSoon(id, title, text) {
-  $(id).innerHTML = `<div><h2>${title}</h2></div><div class="soon">${text}</div>`;
-}
+import { renderPedir, bindPedir, resetPedir, checkNewResponses } from "./pedir.js";
 
 const RENDER = {
   buscar: renderBuscar,
   mapa: renderMapa,
-  pedir: () => renderSoon("#view-pedir", "Pide tu repuesto", "Esta sección llega en la próxima etapa: inicio de sesión y pedidos a las tiendas."),
+  pedir: renderPedir,
   tienda: renderTienda,
   admin: renderAdmin,
 };
@@ -49,6 +45,7 @@ async function start() {
   bindAuth(() => RENDER[S.tab]());
   bindTienda(go);
   bindAdmin(go);
+  bindPedir();
   $("#view-buscar").innerHTML = `<div class="loading">Cargando…</div>`;
   try {
     await Promise.all([loadCatalog(), loadStores()]);
@@ -57,9 +54,11 @@ async function start() {
     $("#view-buscar").innerHTML = `<div class="empty-state">No pudimos conectarnos. Revisa tu conexión a internet y recarga la página.</div>`;
     return;
   }
-  await initAuth((recovery) => { resetTienda(); resetAdmin(); if (recovery) go("tienda"); else if (S.tab === "tienda" || S.tab === "admin") RENDER[S.tab](); });
+  await initAuth((recovery) => { resetTienda(); resetAdmin(); resetPedir(); checkNewResponses(); if (recovery) go("tienda"); else if (["tienda", "admin", "pedir"].includes(S.tab)) RENDER[S.tab](); });
   const h = location.hash;
-  go(h === "#admin" ? "admin" : h === "#tienda" || h.includes("type=recovery") ? "tienda" : "buscar");
+  checkNewResponses();
+  setInterval(checkNewResponses, 120000);
+  go(h === "#pedir" ? "pedir" : h === "#admin" ? "admin" : h === "#tienda" || h.includes("type=recovery") ? "tienda" : "buscar");
 }
 
 if ("serviceWorker" in navigator) {

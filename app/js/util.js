@@ -69,3 +69,13 @@ export const store = {
     try { localStorage.setItem("pc:" + key, JSON.stringify(value)); } catch {}
   },
 };
+
+// "hace 5 min", "hace 2 h", "ayer", "hace 3 días"
+export function ago(date) {
+  const s = (Date.now() - new Date(date).getTime()) / 1000;
+  if (s < 60) return "ahora";
+  if (s < 3600) return `hace ${Math.floor(s / 60)} min`;
+  if (s < 86400) return `hace ${Math.floor(s / 3600)} h`;
+  const d = Math.floor(s / 86400);
+  return d === 1 ? "ayer" : `hace ${d} días`;
+}

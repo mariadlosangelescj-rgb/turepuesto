@@ -1,7 +1,7 @@
 import { db, photoUrl } from "./db.js";
 import { S } from "./state.js";
 import { auth, authForm, signOut, passwordRecoveryForm, isAdmin } from "./auth.js";
-import { $, esc, norm, money, toast, yearOptions } from "./util.js";
+import { $, esc, norm, money, toast, yearOptions, ago } from "./util.js";
 import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
 
@@ -27,10 +27,11 @@ const T = {
   invQ: "", invF: "todos", showPlans: false,
   editing: null, fs: null, fv: null, photoFile: null, photoPreview: null, confirmDel: false, saving: false,
   regPin: null, asStore: null,
+  reqs: [], openCount: 0, ans: {},
 };
 let regMap = null;
 
-export function resetTienda() { Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null, asStore: null }); }
+export function resetTienda() { Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null, asStore: null, reqs: [], openCount: 0, ans: {} }); }
 // La administradora puede abrir el panel de cualquier tienda para cargarle repuestos
 export function openAsStore(id) { resetTienda(); T.asStore = id; }
 
@@ -70,6 +71,69 @@ async function loadExtras() {
   ]);
   T.contacts7 = c.count || 0;
   T.planReq = r.data?.[0]?.plan || null;
+  await loadRequests();
+}
+
+// Pedidos de clientes de los últimos 7 días (solo tiendas activas)
+async function loadRequests() {
+  T.reqs = []; T.openCount = 0;
+  if (T.store.status !== "active") return;
+  if (PLAN[effPlan()].orders) {
+    const since = new Date(Date.now() - 7 * 86400000).toISOString();
+    const { data, error } = await db.from("part_requests")
+      .select("id, part, make, model, year, engine, note, status, created_at, request_responses(store_id, price_text, note)")
+      .eq("status", "open").gte("created_at", since)
+      .order("created_at", { ascending: false }).limit(40);
+    if (error) { console.error(error); return; }
+    T.reqs = data.map((r) => ({ ...r, mine: (r.request_responses || []).find((x) => x.store_id === T.store.id) || null }));
+    T.openCount = T.reqs.filter((r) => !r.mine).length;
+  } else {
+    const { data } = await db.rpc("open_requests_count");
+    T.openCount = data || 0;
+  }
+}
+
+const reqVeh = (r) => [r.make, r.model, r.year, r.engine ? `motor ${r.engine}` : ""].filter(Boolean).join(" ") || "Vehículo sin especificar";
+
+function ordersHTML(pl) {
+  const P = PLAN[pl], st = T.store;
+  const head = (badge) => `<div class="toolbar"><h2 style="font-size:19px">Pedidos de clientes</h2>${badge}</div>`;
+  if (st.status !== "active") return `<section class="panel">${head("")}<p class="muted" style="margin:0;font-size:13.5px">Cuando aprobemos tu tienda verás aquí los repuestos que piden los clientes, para responderles con tu precio.</p></section>`;
+  if (!P.orders) {
+    const up = pl === "plus" ? "plus" : "estandar";
+    const btn = T.asStore ? "" : T.planReq ? '<div class="muted" style="font-size:12.5px">Solicitud enviada</div>' : `<button class="btn btn-signal btn-sm" data-t-reqplan="${up}">Quiero el plan ${PLAN[up].name}</button>`;
+    return `<section class="panel">${head("")}
+      <div class="locked"><b>${T.openCount ? `Hay ${T.openCount} pedido${T.openCount === 1 ? "" : "s"} de clientes esperando respuesta.` : "Los clientes piden repuestos que no encuentran en la app."}</b><span>Con el plan ${PLAN[up].name} ($${PLAN[up].price} al mes) puedes verlos y responderlos para ganar esas ventas.</span>${btn}</div></section>`;
+  }
+  const open = T.reqs.filter((r) => !r.mine), done = T.reqs.filter((r) => r.mine);
+  const badge = `<span class="badge ${open.length ? "b-best" : "b-ok"}">${open.length} sin responder</span>`;
+  if (!T.reqs.length) return `<section class="panel">${head(badge)}<p class="muted" style="margin:0;font-size:13.5px">No hay pedidos ahora. Cuando un cliente pida un repuesto, aparecerá aquí.</p><button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button></section>`;
+  const item = (r) => {
+    const a = T.ans[r.id] || { price: "", note: "" };
+    const top = `<div><b>${esc(r.part)}</b> · ${esc(reqVeh(r))}<div class="muted" style="font-size:12.5px">${ago(r.created_at)}${r.note ? ` · “${esc(r.note)}”` : ""}</div></div>`;
+    if (r.mine) return `<div style="border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px">${top}<div class="muted" style="font-size:13px">Respondiste: <b style="color:var(--ink)">${esc(r.mine.price_text)}</b>${r.mine.note ? ` · ${esc(r.mine.note)}` : ""}</div></div>`;
+    return `<div style="border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:8px">${top}
+      ${T.asStore ? "" : `<div class="grid2"><input type="text" data-ans-price="${r.id}" maxlength="60" placeholder="Precio, ej: $ 30" aria-label="Precio" value="${esc(a.price)}"><input type="text" data-ans-note="${r.id}" maxlength="500" placeholder="Nota (opcional)" aria-label="Nota" value="${esc(a.note)}"></div>
+      <div class="btn-row"><button class="btn btn-primary btn-sm" data-t-answer="${r.id}">Responder</button><button class="btn btn-ghost btn-sm" data-t-noans="${r.id}">No lo tengo</button></div>`}
+    </div>`;
+  };
+  return `<section class="panel">${head(badge)}
+    <p class="muted" style="margin:0;font-size:13px">El cliente ve tu respuesta en la app y te escribe por WhatsApp.</p>
+    ${open.map(item).join("")}
+    ${done.length ? `<details><summary class="muted" style="font-size:13px;cursor:pointer">Ya respondidos (${done.length})</summary>${done.map(item).join("")}</details>` : ""}
+    <button class="btn-link" data-t-reqs style="align-self:flex-start">Actualizar</button>
+  </section>`;
+}
+
+async function answerRequest(id, priceText, note) {
+  const { error } = await db.from("request_responses").insert({ request_id: id, store_id: T.store.id, price_text: priceText, note: note || null });
+  if (error) {
+    console.error(error);
+    if (error.code === "23505") toast("Ya habías respondido este pedido.");
+    else return toast("No pudimos enviar tu respuesta. Inténtalo de nuevo.");
+  } else toast("Respuesta enviada al cliente.");
+  delete T.ans[id];
+  await loadRequests(); syncForm(); renderPanel($("#view-tienda"));
 }
 
 // ---------- Pantalla principal ----------
@@ -187,10 +251,7 @@ function renderPanel(v) {
     </div>
     ${planCard(pl, n)}
     ${T.showPlans ? plansHTML(pl) : ""}
-    <section class="panel">
-      <h2 style="font-size:19px">Pedidos de clientes</h2>
-      <p class="muted" style="margin:0;font-size:13.5px">${P.orders ? "Muy pronto: aquí verás los repuestos que piden los clientes cercanos para responderles con tu precio." : `Los pedidos de clientes están en los planes Estándar y Plus.`}</p>
-    </section>
+    ${ordersHTML(pl)}
     ${!T.editing && n >= P.limit ? limitCard(pl, n) : productForm()}
     <section class="panel">
       <h2 style="font-size:19px">Mis repuestos</h2>
@@ -454,7 +515,12 @@ export function bindTienda(go) {
     if (e.target.id === "store-form") submitStore(e);
     if (e.target.id === "add-form") saveProduct(e);
   });
-  document.addEventListener("input", (e) => { if (e.target.id === "inv-q") { T.invQ = e.target.value; renderInv(); } });
+  document.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.id === "inv-q") { T.invQ = t.value; renderInv(); }
+    else if (t.dataset.ansPrice) (T.ans[t.dataset.ansPrice] ||= { price: "", note: "" }).price = t.value;
+    else if (t.dataset.ansNote) (T.ans[t.dataset.ansNote] ||= { price: "", note: "" }).note = t.value;
+  });
   document.addEventListener("change", (e) => {
     const t = e.target;
     if (t.id === "inv-f") { T.invF = t.value; renderInv(); }
@@ -484,6 +550,16 @@ export function bindTienda(go) {
         () => toast("No pudimos obtener tu ubicación. Revisa los permisos o marca la tienda en el mapa."), { enableHighAccuracy: true, timeout: 10000 });
       return;
     }
+    const an = t.closest("[data-t-answer]");
+    if (an) {
+      const id = +an.dataset.tAnswer, a = T.ans[id] || {};
+      const price = (a.price || "").trim();
+      if (!price) { toast("Escribe el precio, o toca \"No lo tengo\"."); document.querySelector(`[data-ans-price="${id}"]`)?.focus(); return; }
+      an.disabled = true; await answerRequest(id, price, (a.note || "").trim()); return;
+    }
+    const na = t.closest("[data-t-noans]");
+    if (na) { na.disabled = true; await answerRequest(+na.dataset.tNoans, "No disponible", (T.ans[+na.dataset.tNoans]?.note || "").trim()); return; }
+    if (t.closest("[data-t-reqs]")) { await loadRequests(); syncForm(); renderPanel($("#view-tienda")); toast("Pedidos actualizados."); return; }
     if (t.closest("[data-t-plans]")) { syncForm(); T.showPlans = !T.showPlans; renderPanel($("#view-tienda")); return; }
     const rp = t.closest("[data-t-reqplan]");
     if (rp) {
