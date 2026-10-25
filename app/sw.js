@@ -1,24 +1,44 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
-// Los datos (repuestos, tiendas) siempre se piden frescos a internet.
-const VERSION = "tr-v8";
+// Los datos (repuestos, tiendas, pedidos) siempre se piden frescos a internet.
+const VERSION = "tr-v9";
+const LIBS = "tr-libs-1"; // Supabase, mapa y letras: tienen versión fija, se guardan una sola vez
 const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg", "img/icono-192.png", "img/badge-96.png",
   "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/pedir.js", "js/notify.js", "js/push.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== LIBS).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
+const LIB_HOSTS = ["cdn.jsdelivr.net", "unpkg.com", "fonts.googleapis.com", "fonts.gstatic.com"];
+
 self.addEventListener("fetch", (e) => {
-  const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || url.origin !== location.origin) return; // Supabase, mapas, etc.: directo a internet
-  // Primero internet (para tener siempre la última versión); si no hay conexión, la copia guardada
-  e.respondWith(
-    fetch(e.request)
-      .then((r) => { const copy = r.clone(); caches.open(VERSION).then((c) => c.put(e.request, copy)); return r; })
-      .catch(() => caches.match(e.request))
-  );
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+
+  // Librerías con versión fija: si ya están guardadas, se usan sin ir a internet
+  if (LIB_HOSTS.includes(url.hostname)) {
+    e.respondWith(caches.open(LIBS).then(async (c) => {
+      const hit = await c.match(req);
+      if (hit) return hit;
+      const r = await fetch(req);
+      if (r.ok || r.type === "opaque") c.put(req, r.clone());
+      return r;
+    }));
+    return;
+  }
+  if (url.origin !== location.origin) return; // Supabase y el mapa: directo a internet
+
+  // Archivos de la app: se muestran de una vez desde el teléfono y se actualizan por detrás.
+  // Cuando publicamos una versión nueva, se ve la próxima vez que se abra la app.
+  e.respondWith(caches.open(VERSION).then(async (c) => {
+    const hit = await c.match(req, { ignoreSearch: req.mode === "navigate" });
+    const net = fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; });
+    if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
+    return net.catch(() => c.match("./"));
+  }));
 });
 
 // ---------- Notificaciones al celular ----------

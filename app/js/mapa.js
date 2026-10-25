@@ -1,5 +1,5 @@
 import { S, here, askLocation } from "./state.js";
-import { $, esc, distanceKm, kmText, waLink, toast } from "./util.js";
+import { $, esc, distanceKm, kmText, waLink, toast, loadLeaflet } from "./util.js";
 
 let map = null, layer = null;
 
@@ -34,8 +34,13 @@ export function renderMapa() {
   drawMap(list, me);
 }
 
-function drawMap(list, me) {
-  if (typeof L === "undefined") { $("#map").innerHTML = '<div class="loading">No se pudo cargar el mapa.</div>'; return; }
+async function drawMap(list, me) {
+  const box = $("#map");
+  if (!box) return;
+  if (!window.L) box.innerHTML = '<div class="loading">Cargando mapa…</div>';
+  if (!(await loadLeaflet())) { box.innerHTML = '<div class="loading">No se pudo cargar el mapa. Revisa tu conexión.</div>'; return; }
+  if (!document.body.contains(box)) return; // la persona cambió de pantalla mientras cargaba
+  box.innerHTML = "";
   if (map) { map.remove(); map = null; }
   map = L.map("map", { zoomControl: true, attributionControl: true }).setView([me.lat, me.lng], 13);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

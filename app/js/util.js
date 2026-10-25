@@ -79,3 +79,20 @@ export function ago(date) {
   const d = Math.floor(s / 86400);
   return d === 1 ? "ayer" : `hace ${d} días`;
 }
+
+// El mapa (Leaflet) se descarga solo cuando alguien abre un mapa
+let leafletP = null;
+export function loadLeaflet() {
+  if (window.L) return Promise.resolve(true);
+  return (leafletP ||= new Promise((resolve) => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(css);
+    const js = document.createElement("script");
+    js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    js.onload = () => resolve(true);
+    js.onerror = () => { leafletP = null; resolve(false); };
+    document.head.appendChild(js);
+  }));
+}

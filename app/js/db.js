@@ -1,5 +1,7 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
 import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
+
+// Supabase llega en un solo archivo desde index.html; si fallara, se usa la versión por partes
+const { createClient } = window.supabase || (await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm"));
 
 export const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },

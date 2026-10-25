@@ -1,4 +1,4 @@
-import { S, loadCatalog, loadStores } from "./state.js";
+import { S, loadCatalog, loadStores, loadCached } from "./state.js";
 import { $ } from "./util.js";
 import { renderBuscar, bindBuscar, search } from "./buscar.js";
 import { renderMapa, bindMapa } from "./mapa.js";
@@ -50,23 +50,41 @@ async function start() {
   bindAdmin(go);
   bindPedir();
   bindPush(() => RENDER[S.tab]());
-  $("#view-buscar").innerHTML = `<div class="loading">Cargando…</div>`;
-  try {
-    await Promise.all([loadCatalog(), loadStores()]);
-  } catch (err) {
-    console.error(err);
-    $("#view-buscar").innerHTML = `<div class="empty-state">No pudimos conectarnos. Revisa tu conexión a internet y recarga la página.</div>`;
-    return;
-  }
-  await initAuth(async (recovery) => { resetTienda(); resetAdmin(); resetPedir(); startNotify(); await syncPush(!!auth.user); if (recovery) go("tienda"); else if (["tienda", "admin", "pedir"].includes(S.tab)) RENDER[S.tab](); });
+  // Todo se pide a la vez (antes se esperaba una cosa tras otra)
+  const fresh = Promise.all([loadCatalog(), loadStores()]);
+  const authReady = initAuth(async (recovery) => { resetTienda(); resetAdmin(); resetPedir(); startNotify(); await syncPush(!!auth.user); if (recovery) go("tienda"); else if (["tienda", "admin", "pedir"].includes(S.tab)) RENDER[S.tab](); }).catch((e) => console.error(e));
   const h = location.hash;
+  const first = h === "#pedir" ? "pedir" : h === "#admin" ? "admin" : h === "#tienda" || h.includes("type=recovery") ? "tienda" : "buscar";
+
+  if (loadCached()) {
+    // Abre de una vez con lo guardado y actualiza por detrás
+    fresh.then(([catChanged, storesChanged]) => {
+      const typing = document.activeElement?.matches("input, select, textarea");
+      if (S.tab === "buscar" && !typing && catChanged) renderBuscar();
+      else if (S.tab === "buscar" && storesChanged) search();
+      else if (S.tab === "mapa" && storesChanged) RENDER.mapa();
+    }).catch((e) => console.error(e));
+  } else {
+    $("#view-buscar").innerHTML = `<div class="loading">Cargando…</div>`;
+    try { await fresh; } catch (err) {
+      console.error(err);
+      $("#view-buscar").innerHTML = `<div class="empty-state">No pudimos conectarnos. Revisa tu conexión a internet y recarga la página.</div>`;
+      return;
+    }
+  }
+
+  // Buscar no necesita la cuenta: se muestra sin esperarla
+  if (first === "buscar") go("buscar");
+  await authReady;
+  if (first !== "buscar") go(first);
+  else if (S.tab !== "buscar") RENDER[S.tab](); // abrió otra pestaña mientras se cargaba la cuenta
   startNotify();
-  await syncPush(!!auth.user);
-  go(h === "#pedir" ? "pedir" : h === "#admin" ? "admin" : h === "#tienda" || h.includes("type=recovery") ? "tienda" : "buscar");
+  syncPush(!!auth.user);
 }
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  const reg = () => navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (document.readyState === "complete") reg(); else window.addEventListener("load", reg);
   // Al tocar una notificación con la app ya abierta, ir a la pestaña correspondiente
   navigator.serviceWorker.addEventListener("message", (e) => { if (RENDER[e.data?.go]) go(e.data.go); });
 }

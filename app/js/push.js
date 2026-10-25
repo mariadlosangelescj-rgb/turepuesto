@@ -33,7 +33,7 @@ export async function syncPush(loggedIn) {
   try {
     if (!supported() || Notification.permission !== "granted") return;
     const sub = await currentSub();
-    if (sub) { await save(sub); subscribed = true; }
+    if (sub) { await save(sub); subscribed = true; document.querySelectorAll(".push-card").forEach((c) => c.remove()); }
   } catch (e) { console.error(e); }
 }
 

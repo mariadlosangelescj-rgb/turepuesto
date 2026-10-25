@@ -1,7 +1,7 @@
 import { db, photoUrl } from "./db.js";
 import { S } from "./state.js";
 import { auth, authForm, signOut, passwordRecoveryForm, isAdmin } from "./auth.js";
-import { $, esc, norm, money, toast, yearOptions, ago } from "./util.js";
+import { $, esc, norm, money, toast, yearOptions, ago, loadLeaflet } from "./util.js";
 import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
 import { markRequestsSeen } from "./notify.js";
@@ -203,8 +203,13 @@ function renderRegister(v) {
   initRegMap();
 }
 
-function initRegMap() {
-  if (typeof L === "undefined") { $("#reg-map").innerHTML = '<div class="loading">No se pudo cargar el mapa.</div>'; return; }
+async function initRegMap() {
+  const box = $("#reg-map");
+  if (!box) return;
+  if (!window.L) box.innerHTML = '<div class="loading">Cargando mapa…</div>';
+  if (!(await loadLeaflet())) { box.innerHTML = '<div class="loading">No se pudo cargar el mapa. Usa "Usar mi ubicación".</div>'; return; }
+  if (!document.body.contains(box)) return;
+  box.innerHTML = "";
   if (regMap) { regMap.remove(); regMap = null; }
   const c = T.regPin || CENTRO;
   regMap = L.map("reg-map").setView([c.lat, c.lng], 14);

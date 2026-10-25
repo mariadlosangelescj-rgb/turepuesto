@@ -26,13 +26,27 @@ export async function loadCatalog() {
   if (error) throw error;
   const cat = {};
   for (const r of data) (cat[r.make] ||= {})[r.model] = r.engines || [];
+  const changed = JSON.stringify(cat) !== JSON.stringify(S.catalog);
   S.catalog = cat;
+  store.set("cache:catalog", cat);
+  return changed;
+}
+
+// Copia guardada en el teléfono de la última vez: así la app abre al instante
+export function loadCached() {
+  const cat = store.get("cache:catalog", null), st = store.get("cache:stores", null);
+  if (!cat || !st) return false;
+  S.catalog = cat; S.stores = st;
+  return true;
 }
 
 export async function loadStores() {
   const { data, error } = await db.from("stores").select("id, name, zone, address, hours, whatsapp, lat, lng, plan").eq("status", "active");
   if (error) throw error;
+  const changed = JSON.stringify(data) !== JSON.stringify(S.stores);
   S.stores = data;
+  store.set("cache:stores", data);
+  return changed;
 }
 
 export const storeById = (id) => S.stores.find((s) => s.id === id);
