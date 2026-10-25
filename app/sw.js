@@ -1,9 +1,9 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
 // Los datos (repuestos, tiendas, pedidos) siempre se piden frescos a internet.
-const VERSION = "tr-v10";
+const VERSION = "tr-v11";
 const LIBS = "tr-libs-1"; // Supabase, mapa y letras: tienen versión fija, se guardan una sola vez
 const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg", "img/icono-192.png", "img/badge-96.png",
-  "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/pedir.js", "js/notify.js", "js/push.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
+  "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/pedir.js", "js/notify.js", "js/push.js", "js/importar.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting()));
@@ -11,7 +11,7 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== LIBS).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
-const LIB_HOSTS = ["cdn.jsdelivr.net", "unpkg.com", "fonts.googleapis.com", "fonts.gstatic.com"];
+const LIB_HOSTS = ["cdn.sheetjs.com", "cdn.jsdelivr.net", "unpkg.com", "fonts.googleapis.com", "fonts.gstatic.com"];
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;

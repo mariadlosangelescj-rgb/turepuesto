@@ -6,6 +6,7 @@ import { CAT, CAT_LABEL } from "./categorias.js";
 import { CENTRO } from "./config.js";
 import { markRequestsSeen } from "./notify.js";
 import { pushCard } from "./push.js";
+import { importPanelHTML, bindImport, resetImport } from "./importar.js";
 
 // ---------- Planes ----------
 export const PLAN = {
@@ -33,7 +34,7 @@ const T = {
 };
 let regMap = null;
 
-export function resetTienda() { Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null, asStore: null, reqs: [], openCount: 0, ans: {} }); }
+export function resetTienda() { resetImport(); Object.assign(T, { loaded: false, store: null, products: [], editing: null, fs: null, fv: null, planReq: null, asStore: null, reqs: [], openCount: 0, ans: {} }); }
 // La administradora puede abrir el panel de cualquier tienda para cargarle repuestos
 export function openAsStore(id) { resetTienda(); T.asStore = id; }
 
@@ -261,6 +262,7 @@ function renderPanel(v) {
     ${planCard(pl, n)}
     ${T.showPlans ? plansHTML(pl) : ""}
     ${ordersHTML(pl)}
+    ${T.editing ? "" : importPanelHTML(IMPORT_CTX)}
     ${!T.editing && n >= P.limit ? limitCard(pl, n) : productForm()}
     <section class="panel">
       <h2 style="font-size:19px">Mis repuestos</h2>
@@ -519,7 +521,16 @@ function renderInv() {
 }
 
 // ---------- Eventos ----------
+// Lo que necesita la carga desde Excel
+const IMPORT_CTX = {
+  store: () => T.store,
+  products: () => T.products,
+  room: () => (T.asStore || isAdmin() ? Infinity : PLAN[effPlan()].limit - T.products.length),
+  done: async () => { try { await loadProducts(); } catch (e) { console.error(e); } syncForm(); renderPanel($("#view-tienda")); },
+};
+
 export function bindTienda(go) {
+  bindImport(IMPORT_CTX);
   // Llegó un pedido nuevo en vivo: actualizo solo la sección de pedidos
   window.addEventListener("tr:request", async () => {
     if (S.tab !== "tienda" || !T.store || T.asStore) return;
