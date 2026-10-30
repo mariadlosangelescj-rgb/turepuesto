@@ -315,3 +315,5 @@ button:disabled{opacity:.6;cursor:default}
 .imp-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13.5px}
 .imp-sum b{flex-basis:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .imp-err{margin:8px 0 0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:3px;max-height:220px;overflow:auto}
+.brand-logo{margin:0;line-height:0;min-width:0}
+.brand-logo img{height:52px;width:auto;max-width:100%;display:block}

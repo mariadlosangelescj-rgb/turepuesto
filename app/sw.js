@@ -1,8 +1,8 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
 // Los datos (repuestos, tiendas, pedidos) siempre se piden frescos a internet.
-const VERSION = "tr-v12";
+const VERSION = "tr-v13";
 const LIBS = "tr-libs-1"; // Supabase, mapa y letras: tienen versión fija, se guardan una sola vez
-const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg", "img/icono-192.png", "img/apple-touch-icon.png", "img/badge-96.png",
+const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/favicon-64.png", "img/logo-header.png", "img/icono-192.png", "img/apple-touch-icon.png", "img/badge-96.png",
   "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/pedir.js", "js/notify.js", "js/push.js", "js/importar.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 
 self.addEventListener("install", (e) => {
