@@ -83,7 +83,24 @@ async function start() {
 }
 
 if ("serviceWorker" in navigator) {
-  const reg = () => navigator.serviceWorker.register("sw.js").catch(() => {});
+  const reg = () => navigator.serviceWorker.register("sw.js").then((r) => {
+    // Al volver a la app, revisa si publicamos una versión nueva
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) r.update().catch(() => {}); });
+  }).catch(() => {});
+  // Cuando llega una versión nueva: si la app se acaba de abrir, recarga sola; si no, ofrece actualizar
+  const hadController = !!navigator.serviceWorker.controller, t0 = Date.now();
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloading) return;
+    const typing = document.activeElement?.matches("input, textarea, select");
+    if (Date.now() - t0 < 15000 && !typing) { reloading = true; location.reload(); return; }
+    if (document.querySelector(".update-bar")) return;
+    const bar = document.createElement("div");
+    bar.className = "update-bar";
+    bar.innerHTML = `<span>Hay una versión nueva de la app.</span><button class="btn btn-signal btn-sm">Actualizar</button>`;
+    bar.querySelector("button").onclick = () => { reloading = true; location.reload(); };
+    document.body.appendChild(bar);
+  });
   if (document.readyState === "complete") reg(); else window.addEventListener("load", reg);
   // Al tocar una notificación con la app ya abierta, ir a la pestaña correspondiente
   navigator.serviceWorker.addEventListener("message", (e) => { if (RENDER[e.data?.go]) go(e.data.go); });
