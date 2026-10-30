@@ -1,8 +1,8 @@
 // Guarda los archivos de la app para que abra rápido y funcione con señal débil.
 // Los datos (repuestos, tiendas, pedidos) siempre se piden frescos a internet.
-const VERSION = "tr-v11";
+const VERSION = "tr-v12";
 const LIBS = "tr-libs-1"; // Supabase, mapa y letras: tienen versión fija, se guardan una sola vez
-const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg", "img/icono-192.png", "img/badge-96.png",
+const SHELL = ["./", "index.html", "styles.css", "manifest.webmanifest", "img/icono.svg", "img/icono-192.png", "img/apple-touch-icon.png", "img/badge-96.png",
   "js/app.js", "js/auth.js", "js/tienda.js", "js/admin.js", "js/pedir.js", "js/notify.js", "js/push.js", "js/importar.js", "js/buscar.js", "js/mapa.js", "js/state.js", "js/db.js", "js/util.js", "js/config.js", "js/categorias.js"];
 
 self.addEventListener("install", (e) => {
@@ -44,8 +44,8 @@ self.addEventListener("fetch", (e) => {
 // ---------- Notificaciones al celular ----------
 self.addEventListener("push", (e) => {
   let d = {};
-  try { d = e.data ? e.data.json() : {}; } catch { d = { title: "Tu Repuesto", body: e.data?.text() || "" }; }
-  e.waitUntil(self.registration.showNotification(d.title || "Tu Repuesto", {
+  try { d = e.data ? e.data.json() : {}; } catch { d = { title: "Tu Repuesto Aquí", body: e.data?.text() || "" }; }
+  e.waitUntil(self.registration.showNotification(d.title || "Tu Repuesto Aquí", {
     body: d.body || "",
     icon: "img/icono-192.png",
     badge: "img/badge-96.png",

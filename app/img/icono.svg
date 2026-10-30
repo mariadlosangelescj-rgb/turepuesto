@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0f4c5c"/><g transform="translate(64 64) scale(8)"><circle cx="24" cy="24" r="19" fill="none" stroke="#f2b705" stroke-width="6" stroke-dasharray="7.46 7.46"/><circle cx="24" cy="24" r="16.5" fill="#f2b705"/><path d="M24 12.5a7.5 7.5 0 0 0-7.5 7.5c0 5.6 7.5 13 7.5 13s7.5-7.4 7.5-13a7.5 7.5 0 0 0-7.5-7.5z" fill="#0f4c5c"/><circle cx="24" cy="20" r="2.8" fill="#f2b705"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0B2D4A"/><g transform="translate(70 66) scale(6)"><g fill="#fff"><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(22.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(67.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(112.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(157.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(202.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(247.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(292.5 31 29)"/><rect x="27.2" y="5.2" width="7.6" height="9" rx="1.6" transform="rotate(337.5 31 29)"/><circle cx="31" cy="29" r="20"/></g>
+<circle cx="31" cy="29" r="14.6" fill="#0B2D4A"/>
+<g fill="#fff">
+  <path d="M21.4 27.6 23.7 21.6Q24.4 19.8 26.4 19.8H35.6Q37.6 19.8 38.3 21.6L40.6 27.6Z"/>
+  <rect x="18.6" y="26.6" width="24.8" height="8.6" rx="3"/>
+  <rect x="20" y="33" width="5" height="4.2" rx="1.2"/><rect x="37" y="33" width="5" height="4.2" rx="1.2"/>
+  <rect x="16.8" y="25.6" width="3.4" height="2" rx="1"/><rect x="41.8" y="25.6" width="3.4" height="2" rx="1"/>
+</g>
+<path d="M23.6 26.4 25.2 22.3Q25.6 21.4 26.7 21.4H35.3Q36.4 21.4 36.8 22.3L38.4 26.4Z" fill="#0B2D4A"/>
+<rect x="20.6" y="29" width="5.4" height="2" rx="1" fill="#0B2D4A"/><rect x="36" y="29" width="5.4" height="2" rx="1" fill="#0B2D4A"/>
+<path d="M2.5 41.5C6 57.5 44 62 60 29 51.5 46.5 29 53.5 12 48.4 8 47.2 4.6 45 2.5 41.5Z" fill="#FF7A00"/>
+<path d="M31 53.6S23.8 46.2 23.8 41.4A7.2 7.2 0 0 1 38.2 41.4C38.2 46.2 31 53.6 31 53.6Z" fill="#FF7A00" stroke="#0B2D4A" stroke-width="1.6" stroke-linejoin="round"/>
+<circle cx="31" cy="41.2" r="2.7" fill="#0B2D4A"/></g></svg>

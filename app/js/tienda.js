@@ -158,7 +158,7 @@ export async function renderTienda() {
 
 function renderLogin(v) {
   v.innerHTML = `
-    <div><div class="eyebrow">Para tiendas de repuestos</div><h2>Vende en Tu Repuesto</h2><p class="muted" style="margin:4px 0 0">Publica tus repuestos y recibe clientes de San Cristóbal por WhatsApp.</p></div>
+    <div><div class="eyebrow">Para tiendas de repuestos</div><h2>Vende en Tu Repuesto Aquí</h2><p class="muted" style="margin:4px 0 0">Publica tus repuestos y recibe clientes de San Cristóbal por WhatsApp.</p></div>
     <ul class="perks"><li>Tus repuestos aparecen cuando alguien busca para su carro</li><li>Los clientes te escriben directo por WhatsApp</li><li>El primer mes es gratis</li></ul>
     <section class="panel auth-card">
       <h2 style="font-size:19px">Entra o crea tu cuenta</h2>

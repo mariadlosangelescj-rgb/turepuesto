@@ -1,16 +1,16 @@
 {
-  "name": "Tu Repuesto · Repuestos en San Cristóbal",
+  "name": "Tu Repuesto Aquí · Repuestos en San Cristóbal",
   "short_name": "Tu Repuesto",
   "description": "Encuentra repuestos para tu carro en las tiendas de San Cristóbal.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#e9eef0",
-  "theme_color": "#0f4c5c",
+  "background_color": "#E9EDF2",
+  "theme_color": "#0B2D4A",
   "icons": [
     { "src": "img/icono-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "img/icono-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "img/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "img/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

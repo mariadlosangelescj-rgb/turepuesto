@@ -156,7 +156,7 @@ export async function openResult(i) {
   if (!r) return;
   const st = r.st;
   const car = S.car.make ? plateText() : vehText(r);
-  const msg = `Hola, vi en Tu Repuesto: ${r.p.name}${r.part_brand ? ` marca ${r.part_brand}` : ""}${r.part_number ? ` (ref. ${r.part_number})` : ""} para ${car}. ¿Lo tienen disponible? Precio publicado: ${money(r.price, r.p.currency)}.`;
+  const msg = `Hola, vi en Tu Repuesto Aquí: ${r.p.name}${r.part_brand ? ` marca ${r.part_brand}` : ""}${r.part_number ? ` (ref. ${r.part_number})` : ""} para ${car}. ¿Lo tienen disponible? Precio publicado: ${money(r.price, r.p.currency)}.`;
   const maps = st.lat != null ? `https://www.google.com/maps/dir/?api=1&destination=${st.lat},${st.lng}` : null;
 
   $("#sheet-in").innerHTML = `

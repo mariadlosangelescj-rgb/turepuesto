@@ -104,7 +104,7 @@ function respHTML(r, x) {
   const dist = st ? ` <span class="dist">· ${kmText(distanceKm(here(), st))}</span>` : "";
   const no = isNo(x);
   const wa = st && !no && r.status === "open"
-    ? `<a class="btn btn-wa btn-sm resp-wa" target="_blank" rel="noopener" data-p-wa="${st.id}" href="${esc(waLink(st.whatsapp, `Hola, pedí en Tu Repuesto: ${r.part} para ${vehOf(r)}. Me respondieron ${x.price_text}.`))}">Continuar por WhatsApp</a>`
+    ? `<a class="btn btn-wa btn-sm resp-wa" target="_blank" rel="noopener" data-p-wa="${st.id}" href="${esc(waLink(st.whatsapp, `Hola, pedí en Tu Repuesto Aquí: ${r.part} para ${vehOf(r)}. Me respondieron ${x.price_text}.`))}">Continuar por WhatsApp</a>`
     : "";
   return `<div class="resp"><span><b>${esc(name)}</b>${dist}</span><span class="p" ${no ? 'style="color:var(--muted);font-weight:500"' : ""}>${esc(x.price_text)}</span>${x.note ? `<span class="note">${esc(x.note)}</span>` : ""}${wa}</div>`;
 }

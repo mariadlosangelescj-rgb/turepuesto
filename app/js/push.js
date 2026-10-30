@@ -69,7 +69,7 @@ export function pushCard(text) {
   if (subscribed && Notification.permission === "granted") return "";
   let inner;
   if (!supported()) {
-    if (isIOS && !installed()) inner = `<b>Recibe avisos en tu iPhone</b><span>Primero agrega Tu Repuesto a tu pantalla de inicio: toca el botón Compartir <b>⬆</b> de Safari y luego <b>"Agregar a inicio"</b>. Ábrela desde ese ícono y activa los avisos aquí.</span>`;
+    if (isIOS && !installed()) inner = `<b>Recibe avisos en tu iPhone</b><span>Primero agrega Tu Repuesto Aquí a tu pantalla de inicio: toca el botón Compartir <b>⬆</b> de Safari y luego <b>"Agregar a inicio"</b>. Ábrela desde ese ícono y activa los avisos aquí.</span>`;
     else return "";
   } else if (Notification.permission === "denied") {
     inner = `<b>Los avisos están bloqueados</b><span>Para recibirlos, permite las notificaciones de este sitio en los ajustes del navegador.</span>`;
