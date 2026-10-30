@@ -2,7 +2,7 @@
 /* Layout: one phone-width app column, sticky header, bottom tab bar. Marca Tu Repuesto Aquí: azul marino #0B2D4A, naranja #FF7A00, gris claro #E9EDF2, Montserrat */
 :root{
   --bg:#E9EDF2; --surface:#ffffff; --surface-2:#f4f6f9; --ink:#0f1e2c; --muted:#5b6878; --line:#d5dce5;
-  --petrol:#0B2D4A; --petrol-soft:#dde6f0; --signal:#FF7A00; --signal-ink:#0B2D4A;
+  --petrol:#0B2D4A; --petrol-soft:#dde6f0; --signal:#F57200; --signal-ink:#ffffff;
   --ok:#1d7f47; --ok-soft:#dff3e7; --warn:#b4401a; --warn-soft:#fbe7de;
   --map:#e4ebe6; --map-road:#ffffff; --map-river:#9fc7d6; --map-block:#d6e0da;
   --shadow:0 1px 2px rgba(11,45,74,.08),0 4px 14px rgba(11,45,74,.06);
@@ -12,13 +12,13 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#07111b; --surface:#0f1f2e; --surface-2:#142838; --ink:#e6edf4; --muted:#93a3b5; --line:#22364a;
-  --petrol:#86b8e3; --petrol-soft:#16324b; --signal:#ff8a24; --signal-ink:#0B2D4A;
+  --petrol:#86b8e3; --petrol-soft:#16324b; --signal:#F57200; --signal-ink:#ffffff;
   --ok:#52c585; --ok-soft:#163626; --warn:#f08d62; --warn-soft:#3a2017;
   --map:#13201f; --map-road:#2a3b3d; --map-river:#1f4b5a; --map-block:#1a2a28;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#07111b; --surface:#0f1f2e; --surface-2:#142838; --ink:#e6edf4; --muted:#93a3b5; --line:#22364a;
-  --petrol:#86b8e3; --petrol-soft:#16324b; --signal:#ff8a24; --signal-ink:#0B2D4A;
+  --petrol:#86b8e3; --petrol-soft:#16324b; --signal:#F57200; --signal-ink:#ffffff;
   --ok:#52c585; --ok-soft:#163626; --warn:#f08d62; --warn-soft:#3a2017;
   --map:#13201f; --map-road:#2a3b3d; --map-river:#1f4b5a; --map-block:#1a2a28;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark}
